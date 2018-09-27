@@ -15,5 +15,7 @@
 #### 0x02 关于Cgo
 
 我们第一个情况是要将go打成可以被C++调用的动态链接库, 那么必然选择cgo，在go中import C，需要关注几点
-	
 
+![go代码](https://github.com/oldwind/cgo-cpp-php/blob/master/img/123.png)
+
+1. 
