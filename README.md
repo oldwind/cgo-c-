@@ -16,27 +16,4 @@
 
 我们第一个情况是要将go打成可以被C++调用的动态链接库, 那么必然选择cgo，在go中import C，需要关注几点
 	
-	 package main
-
-	 import "C" 
-	 
-	 import (
-		 "unsafe"
-		 "fmt"
-	 )
-	 
-	 var ret [10240]byte
- 
-	// export和注释符号//不能存在空格
-	//export myFunc
-	func myFunc(param1 string) (*C.char, int32) {
-		str := []byte("test return")
-		copy(ret[:], str);
-		retP := (*C.char)(unsafe.Pointer(&ret))
-
-		defer println(retP)
-		return retP, int32(4)
-	}
- 
-	func main() {}
 
