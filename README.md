@@ -87,16 +87,71 @@ php扩展开发的方案有很多，这里推荐 http://www.laruence.com/2009/04
 
 4. 通过第20271行，我们回过去找一下，可以发现 "--enable-debug"指令会支持php源码的调试，所以 configure的时候，我们处理一下
 
-		./configure --enable-debug --prefix=/php-5.4
+		 ./configure --prefix=/php-5.4 \
+				--with-config-file-path=/php-5.4/etc \
+				--with-config-file-scan-dir=/php-5.4/etc/php.d \
+				--with-mcrypt=/usr/include \
+				--enable-mysqlnd \
+				--with-mysqli \
+				--with-pdo-mysql \
+				--enable-fpm \
+				--with-fpm-user=nginx \
+				--with-fpm-group=nginx \
+				--with-gd \
+				--with-iconv \
+				--with-zlib \
+				--enable-xml \
+				--enable-shmop \
+				--enable-sysvmsg \
+				--enable-inline-optimization \
+				--enable-mbregex \
+				--enable-mbstring \
+				--enable-ftp \
+				--enable-gd-native-ttf \
+				--enable-pcntl \
+				--enable-sockets \
+				--with-xmlrpc \
+				--enable-zip \
+				--enable-soap \
+				--without-pear \
+				--enable-session \
+				--with-curl \
+				--enable-sysvshm \
+				--enable-sysvsem \
+				--enable-debug
 
 		
 		
+5. configure之后，make如果出现下面的错误
+			
+		Zend/zend_language_parser.y:50.1-5: invalid directive: `%code'
+		
+	主要是bison的版本过低，升级一下bison就可以
+			
+		wget http://ftp.gnu.org/gnu/bison/bison-2.4.2.tar.gz
+		tar -zxvf bison-2.4.2.tar.gz
+		cd bison-2.4.2/
+		./configure
+		sudo make && make install
 
 
+6. php程序安装好以后，将php.ini复制到/etc目录下面，从源码程序里面，我们能找到, 拷贝过去 
+		
+		php.ini-development
+		php.ini-production
 
 
-
-
+7. 修改名为php.ini，然后修改加载扩展的路径，和增加扩展名就可以了
+		
+		; Directory in which the loadable extensions (modules) reside.
+		; http://php.net/extension-dir
+		extension_dir = "./"
+		; On windows:
+		; extension_dir = "ext"
+		
+		
+		[test]
+		extension=test.so
 
 
 
