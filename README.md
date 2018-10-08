@@ -59,6 +59,9 @@ php扩展开发的方案有很多，这里推荐 http://www.laruence.com/2009/04
 
 - **加载办法:** 这个就是针对不同的编译环境，不同的架构做考虑了
 
+
+#### 0x03 php的扩展的调试办法
+
 而对于php扩展的调试，正常情况下，可以采用gdb调试，这里讲一下php的源码编译过程中，如何支持调试
 
 1. php源码下载
@@ -80,10 +83,9 @@ php扩展开发的方案有很多，这里推荐 http://www.laruence.com/2009/04
 		./buildconf
 
 3. 打开configure，我们找一下如何在编译中支持debug模式，configure的代码很恐怖，有11W行，通过 "-g -O0"搜索一下，我们找到响应的配置
-
 ![go代码](https://github.com/oldwind/cgo-cpp-php/blob/master/img/configure.png)
 
-通过第20271行，我们回过去找一下，可以发现 "--enable-debug"指令会支持php源码的调试，所以 configure的时候，我们处理一下
+4. 通过第20271行，我们回过去找一下，可以发现 "--enable-debug"指令会支持php源码的调试，所以 configure的时候，我们处理一下
 
 		./configure --enable-debug --prefix=/php-5.4
 
