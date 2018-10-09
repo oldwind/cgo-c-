@@ -155,3 +155,13 @@ php扩展开发的方案有很多，这里推荐 http://www.laruence.com/2009/04
 
 
 
+#### 0x04 PHP扩展开发
+
+1. 扩展开发
+	进入php的源码目录,在ext目录下执行
+	
+		./ext_skel --extname=test
+		
+	生成一个test文件，我们定义一个test方法，在执行一下
+		
+2。 

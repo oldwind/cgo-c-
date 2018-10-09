@@ -98,7 +98,7 @@ PHP_RINIT_FUNCTION(cgocppphp)
  */
 PHP_RSHUTDOWN_FUNCTION(cgocppphp)
 {
-	php_error(E_WARNING, "PHP_RSHUTDOWN_FUNCTION(xchain)");
+	php_error(E_WARNING, "PHP_RSHUTDOWN_FUNCTION(xchain)");  
 	return SUCCESS;
 }
 /* }}} */
