@@ -1,10 +1,6 @@
 <?php
 
-$testObj = new CgoCppPhp();
-$testObj->test();
-
-echo "result";
-
+echo confirm_goproxy_compiled("hello");
 
 
 
