@@ -1,11 +1,11 @@
 ### cgo-cpp-php
 
-#### 背景
+#### 一、背景
 
 	解决php调用go的一个deamon
 
 
-#### 环境说明
+#### 二、环境说明
 
 	php 版本
 		PHP 5.4.46-dev (cli) (built: Oct 10 2018 16:46:08) (DEBUG)
@@ -17,7 +17,7 @@
 		go version go1.10 linux/amd64
 
 	
-#### go动态连接库编译说明
+#### 三、go动态连接库编译说明
 
 	如果出现错误
 		/home/users/yebin02/go/go/src/net/cgo_resnew.go:20:44: could not determine kind of name for C.char
@@ -27,3 +27,7 @@
 	CC中选择高版本的gcc
 
 		CC=/opt/compiler/gcc-4.8.2/bin/gcc  go build -o my_go_capi.so -buildmode=c-shared  my_go_capi.go
+
+#### 四、wiki
+	
+	https://github.com/oldwind/cgo-cpp-php/wiki/cgo-&&-cpp-&&-php
