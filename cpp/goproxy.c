@@ -217,7 +217,16 @@ PHP_FUNCTION(confirm_goproxy_compiled)
 
 	GoString params = {arg, arg_len};
 	ret = my_func(params);
-	return;
+
+	char res[128];
+	strncpy(res, ret.r0, ret.r1);
+
+	if (ret.r0 != NULL) {
+		RETURN_STRINGL(res, ret.r1, 1);
+	} else {
+		RETURN_FALSE;
+	}
+
 
 	// len = spprintf(&strg, 0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "goproxy", arg);
 	// RETURN_STRINGL(strg, len, 0);
