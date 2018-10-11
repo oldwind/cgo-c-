@@ -26,6 +26,11 @@
 #include "php_ini.h"
 #include "ext/standard/info.h"
 #include "php_goproxy.h"
+#include "php_ini.h"
+#include "my_go_capi.h"
+
+
+
 
 /* If you declare any globals in php_goproxy.h uncomment this:
 ZEND_DECLARE_MODULE_GLOBALS(goproxy)
@@ -33,6 +38,10 @@ ZEND_DECLARE_MODULE_GLOBALS(goproxy)
 
 /* True global resources - no need for thread safety here */
 static int le_goproxy;
+static void* so_handle;
+typedef struct myFunc_return (* go_func)(GoString p0);
+go_func my_func = NULL;
+
 
 /* {{{ goproxy_functions[]
  *
@@ -70,12 +79,14 @@ ZEND_GET_MODULE(goproxy)
 
 /* {{{ PHP_INI
  */
-/* Remove comments and fill if you need to have entries in php.ini
+/* Remove comments and fill if you need to have entries in php.ini*/
 PHP_INI_BEGIN()
-    STD_PHP_INI_ENTRY("goproxy.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_goproxy_globals, goproxy_globals)
-    STD_PHP_INI_ENTRY("goproxy.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_goproxy_globals, goproxy_globals)
+	PHP_INI_ENTRY("cometest.goextpath", "/home/users/yebin02/php-5.4/bin/", PHP_INI_ALL, NULL)
+	PHP_INI_ENTRY("cometest.gosoname", "my_go_capi.so", PHP_INI_ALL, NULL)
+    // STD_PHP_INI_ENTRY("goproxy.global_value",      "42", PHP_INI_ALL, OnUpdateLong, global_value, zend_goproxy_globals, goproxy_globals)
+    // STD_PHP_INI_ENTRY("goproxy.global_string", "foobar", PHP_INI_ALL, OnUpdateString, global_string, zend_goproxy_globals, goproxy_globals)
 PHP_INI_END()
-*/
+
 /* }}} */
 
 /* {{{ php_goproxy_init_globals
@@ -93,6 +104,7 @@ static void php_goproxy_init_globals(zend_goproxy_globals *goproxy_globals)
  */
 PHP_MINIT_FUNCTION(goproxy)
 {
+	REGISTER_INI_ENTRIES();
 	/* If you have INI entries, uncomment these lines 
 	REGISTER_INI_ENTRIES();
 	*/
@@ -104,6 +116,7 @@ PHP_MINIT_FUNCTION(goproxy)
  */
 PHP_MSHUTDOWN_FUNCTION(goproxy)
 {
+	UNREGISTER_INI_ENTRIES();
 	/* uncomment this line if you have INI entries
 	UNREGISTER_INI_ENTRIES();
 	*/
@@ -116,16 +129,37 @@ PHP_MSHUTDOWN_FUNCTION(goproxy)
  */
 PHP_RINIT_FUNCTION(goproxy)
 {
+	char go_so_path[256];
+	char *goextpath = INI_STR("cometest.goextpath");
+	char *gosoname  = INI_ORIG_STR("cometest.gosoname");
+	
+	strcpy(go_so_path, goextpath);
+
+	if (gosoname != NULL) {
+		strcat(go_so_path, gosoname);
+	}
+
 	// 加载xuperchain的动态连接库
-	void* so_handle = dlopen("my_go_capi.so", RTLD_LAZY);
+	so_handle = dlopen(go_so_path, RTLD_LAZY);
     if ( so_handle == NULL ) {
 		php_error(E_WARNING, "Failed load my_go_capi.so error");
 		return SUCCESS;
     }
-    char* pszErr = dlerror();
+    
+	char* pszErr = dlerror();
     if(pszErr != NULL) {
         php_error(E_WARNING, pszErr);
 		return SUCCESS;
+    }
+
+	// init
+	void *m_function = dlsym(so_handle, "myFunc");
+	my_func = (go_func)m_function;
+	
+	pszErr  = dlerror();
+    if (pszErr != NULL) {
+        php_error(E_WARNING, pszErr);
+        dlclose(so_handle);
     }
 
 	return SUCCESS;
@@ -165,6 +199,9 @@ PHP_MINFO_FUNCTION(goproxy)
    Return a string to confirm that the module is compiled in */
 PHP_FUNCTION(confirm_goproxy_compiled)
 {
+
+	struct myFunc_return ret;
+
 	char *arg = NULL;
 	int arg_len, len;
 	char *strg;
@@ -173,8 +210,17 @@ PHP_FUNCTION(confirm_goproxy_compiled)
 		return;
 	}
 
-	len = spprintf(&strg, 0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "goproxy", arg);
-	RETURN_STRINGL(strg, len, 0);
+	if (my_func == NULL) {
+		php_error(E_WARNING, "go_func point is NULL");
+		RETURN_FALSE;
+	}
+
+	GoString params = {arg, arg_len};
+	ret = my_func(params);
+	return;
+
+	// len = spprintf(&strg, 0, "Congratulations! You have successfully modified ext/%.78s/config.m4. Module %.78s is now compiled into PHP.", "goproxy", arg);
+	// RETURN_STRINGL(strg, len, 0);
 }
 /* }}} */
 /* The previous line is meant for vim and emacs, so it can correctly fold and 
